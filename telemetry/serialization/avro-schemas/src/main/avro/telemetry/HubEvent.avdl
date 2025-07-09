@@ -1,4 +1,88 @@
 @namespace("ru.yandex.practicum.kafka.telemetry.event")
 protocol HubEventProtocol {
+	record DeviceAddedEventAvro {
+		string hubId;
+		@logicalType("timestamp-millis")
+		long timestamp;
+		string id;
+		DeviceTypeAvro type;
+	}
 
+	record DeviceRemovedEventAvro {
+		string hubId;
+		@logicalType("timestamp-millis")
+		long timestamp;
+		string id;
+	}
+
+	record DeviceActionAvro {
+		string sensorId;
+		DeviceActionTypeAvro type;
+		int value;
+	}
+
+	record ScenarioAddedEventAvro {
+		string hubId;
+		@logicalType("timestamp-millis")
+		long timestamp;
+		string name;
+		array<ScenarioConditionAvro> conditions;
+		array<DeviceActionAvro> actions;
+	}
+
+	record ScenarioRemoveEventAvro {
+		string hubId;
+		@logicalType("timestamp-millis")
+		long timestamp;
+		string name;
+	}
+
+	record ScenarioConditionAvro {
+		string sensorId;
+		ScenarioConditionTypeAvro type;
+		ScenarioConditionOperationAvro operation;
+		int value;
+	}
+
+	record HubEventAvro {
+		string hubId;
+		@logicalType("timestamp-millis")
+		long timestamp;
+		union {
+			DeviceAddedEventAvro,
+			DeviceRemovedEventAvro,
+			ScenarioAddedEventAvro,
+			ScenarioRemoveEventAvro
+		} payload;
+	}
+
+	enum ScenarioConditionOperationAvro {
+		EQUALS,
+		GREATER_THAN,
+		LOWER_THAN
+	}
+
+	enum ScenarioConditionTypeAvro {
+		MOTION,
+		LUMINOSITY,
+		SWITCH,
+		TEMPERATURE,
+		CO2LEVEL,
+		HUMIDITY
+	}
+
+	enum DeviceTypeAvro {
+		MOTION_SENSOR,
+		TEMPERATURE_SENSOR,
+		LIGHT_SENSOR,
+		CLIMATE_SENSOR,
+		SWITCH_SENSOR
+	}
+
+	enum DeviceActionTypeAvro {
+		ACTIVATE,
+		DEACTIVATE,
+		INVERSE,
+		SET_VALUE
+	}
 }
