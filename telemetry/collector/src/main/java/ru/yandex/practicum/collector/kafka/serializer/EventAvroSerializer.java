@@ -5,6 +5,7 @@ import org.apache.avro.io.DatumWriter;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.avro.specific.SpecificRecordBase;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Serializer;
 
@@ -23,6 +24,10 @@ public class EventAvroSerializer implements Serializer<SpecificRecordBase> {
                 writer.write(data, encoder);
                 encoder.flush();
             }
+
+            byte[] result = out.toByteArray();
+            System.out.println("Serialized bytes (hex): " + Hex.encodeHexString(result));
+
             return out.toByteArray();
         } catch (IOException ex) {
             throw new SerializationException("Ошибка сериализации данных для топика [" + topic + "]", ex);
