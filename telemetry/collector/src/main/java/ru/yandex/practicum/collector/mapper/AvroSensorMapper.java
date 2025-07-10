@@ -5,6 +5,7 @@ import ru.yandex.practicum.collector.dto.sensor.*;
 import ru.yandex.practicum.kafka.telemetry.event.*;
 
 public class AvroSensorMapper {
+
     public static SpecificRecordBase toAvro(SensorEvent sensorEvent) {
         SensorEventType type = sensorEvent.getType();
 
@@ -20,9 +21,6 @@ public class AvroSensorMapper {
 
     private static SpecificRecordBase climateSensorEventToAvro(ClimateSensorEvent event) {
         ClimateSensorEventAvro payload = ClimateSensorEventAvro.newBuilder()
-                .setId(event.getId())
-                .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp())
                 .setTemperatureC(event.getTemperatureC())
                 .setHumidity(event.getHumidity())
                 .setCo2Level(event.getCo2Level())
@@ -38,9 +36,6 @@ public class AvroSensorMapper {
 
     private static SpecificRecordBase lightSensorEventToAvro(LightSensorEvent event) {
         LightSensorEventAvro payload = LightSensorEventAvro.newBuilder()
-                .setId(event.getId())
-                .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp())
                 .setLinkQuality(event.getLinkQuality())
                 .setLuminosity(event.getLuminosity())
                 .build();
@@ -55,9 +50,6 @@ public class AvroSensorMapper {
 
     private static SpecificRecordBase motionSensorEventToAvro(MotionSensorEvent event) {
         MotionSensorEventAvro payload = MotionSensorEventAvro.newBuilder()
-                .setId(event.getId())
-                .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp())
                 .setLinkQuality(event.getLinkQuality())
                 .setMotion(event.getMotion())
                 .setVoltage(event.getVoltage())
@@ -73,9 +65,6 @@ public class AvroSensorMapper {
 
     private static SpecificRecordBase switchSensorEventToAvro(SwitchSensorEvent event) {
         SwitchSensorEventAvro payload = SwitchSensorEventAvro.newBuilder()
-                .setId(event.getId())
-                .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp())
                 .setState(event.getState())
                 .build();
 
@@ -89,9 +78,6 @@ public class AvroSensorMapper {
 
     private static SpecificRecordBase temperatureSensorEventToAvro(TemperatureSensorEvent event) {
         TemperatureSensorEventAvro payload = TemperatureSensorEventAvro.newBuilder()
-                .setId(event.getId())
-                .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp())
                 .setTemperatureC(event.getTemperatureC())
                 .setTemperatureF(event.getTemperatureF())
                 .build();
