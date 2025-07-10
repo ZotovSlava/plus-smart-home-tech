@@ -18,16 +18,14 @@ public class AvroSensorMapper {
     }
 
     private static SpecificRecordBase lightSensorEventToAvro(LightSensorEvent event) {
-        return LightSensorEventAvro.newBuilder()
-                .setId(event.getId())
+        return LightSensorAvro.newBuilder()
                 .setLinkQuality(event.getLinkQuality())
                 .setLuminosity(event.getLuminosity())
                 .build();
     }
 
     private static SpecificRecordBase motionSensorEventToAvro(MotionSensorEvent event) {
-        return MotionSensorEventAvro.newBuilder()
-                .setId(event.getId())
+        return MotionSensorAvro.newBuilder()
                 .setLinkQuality(event.getLinkQuality())
                 .setVoltage(event.getVoltage())
                 .setMotion(event.getMotion())
@@ -35,15 +33,13 @@ public class AvroSensorMapper {
     }
 
     private static SpecificRecordBase switchSensorEventToAvro(SwitchSensorEvent event) {
-        return SwitchSensorEventAvro.newBuilder()
-                .setId(event.getId())
+        return SwitchSensorAvro.newBuilder()
                 .setState(event.getState())
                 .build();
     }
 
     private static SpecificRecordBase climateSensorEventToAvro(ClimateSensorEvent event) {
-        return ClimateSensorEventAvro.newBuilder()
-                .setId(event.getId())
+        return ClimateSensorAvro.newBuilder()
                 .setTemperatureC(event.getTemperatureC())
                 .setHumidity(event.getHumidity())
                 .setCo2Level(event.getCo2Level())
@@ -51,8 +47,10 @@ public class AvroSensorMapper {
     }
 
     private static SpecificRecordBase temperatureSensorEventToAvro(TemperatureSensorEvent event) {
-        return TemperatureSensorEventAvro.newBuilder()
+        return TemperatureSensorAvro.newBuilder()
                 .setId(event.getId())
+                .setHubId(event.getHubId())
+                .setTimestamp(event.getTimestamp())
                 .setTemperatureC(event.getTemperatureC())
                 .setTemperatureF(event.getTemperatureF())
                 .build();
