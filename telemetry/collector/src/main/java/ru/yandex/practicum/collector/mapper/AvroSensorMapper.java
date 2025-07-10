@@ -14,42 +14,12 @@ public class AvroSensorMapper {
             case SWITCH_SENSOR_EVENT -> switchSensorEventToAvro((SwitchSensorEvent) sensorEvent);
             case CLIMATE_SENSOR_EVENT -> climateSensorEventToAvro((ClimateSensorEvent) sensorEvent);
             case TEMPERATURE_SENSOR_EVENT -> temperatureSensorEventToAvro((TemperatureSensorEvent) sensorEvent);
-            default -> throw new IllegalArgumentException("Unknown action type: " + type);
+            default -> throw new IllegalArgumentException("Unknown sensor type: " + type);
         };
     }
 
-    private static SpecificRecordBase lightSensorEventToAvro(LightSensorEvent event) {
-        return LightSensorAvro.newBuilder()
-                .setId(event.getId())
-                .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp())
-                .setLinkQuality(event.getLinkQuality())
-                .setLuminosity(event.getLuminosity())
-                .build();
-    }
-
-    private static SpecificRecordBase motionSensorEventToAvro(MotionSensorEvent event) {
-        return MotionSensorAvro.newBuilder()
-                .setId(event.getId())
-                .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp())
-                .setLinkQuality(event.getLinkQuality())
-                .setVoltage(event.getVoltage())
-                .setMotion(event.getMotion())
-                .build();
-    }
-
-    private static SpecificRecordBase switchSensorEventToAvro(SwitchSensorEvent event) {
-        return SwitchSensorAvro.newBuilder()
-                .setId(event.getId())
-                .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp())
-                .setState(event.getState())
-                .build();
-    }
-
     private static SpecificRecordBase climateSensorEventToAvro(ClimateSensorEvent event) {
-        return ClimateSensorAvro.newBuilder()
+        ClimateSensorEventAvro payload = ClimateSensorEventAvro.newBuilder()
                 .setId(event.getId())
                 .setHubId(event.getHubId())
                 .setTimestamp(event.getTimestamp())
@@ -57,15 +27,80 @@ public class AvroSensorMapper {
                 .setHumidity(event.getHumidity())
                 .setCo2Level(event.getCo2Level())
                 .build();
+
+        return SensorEventAvro.newBuilder()
+                .setId(event.getId())
+                .setHubId(event.getHubId())
+                .setTimestamp(event.getTimestamp())
+                .setPayload(payload)
+                .build();
+    }
+
+    private static SpecificRecordBase lightSensorEventToAvro(LightSensorEvent event) {
+        LightSensorEventAvro payload = LightSensorEventAvro.newBuilder()
+                .setId(event.getId())
+                .setHubId(event.getHubId())
+                .setTimestamp(event.getTimestamp())
+                .setLinkQuality(event.getLinkQuality())
+                .setLuminosity(event.getLuminosity())
+                .build();
+
+        return SensorEventAvro.newBuilder()
+                .setId(event.getId())
+                .setHubId(event.getHubId())
+                .setTimestamp(event.getTimestamp())
+                .setPayload(payload)
+                .build();
+    }
+
+    private static SpecificRecordBase motionSensorEventToAvro(MotionSensorEvent event) {
+        MotionSensorEventAvro payload = MotionSensorEventAvro.newBuilder()
+                .setId(event.getId())
+                .setHubId(event.getHubId())
+                .setTimestamp(event.getTimestamp())
+                .setLinkQuality(event.getLinkQuality())
+                .setMotion(event.getMotion())
+                .setVoltage(event.getVoltage())
+                .build();
+
+        return SensorEventAvro.newBuilder()
+                .setId(event.getId())
+                .setHubId(event.getHubId())
+                .setTimestamp(event.getTimestamp())
+                .setPayload(payload)
+                .build();
+    }
+
+    private static SpecificRecordBase switchSensorEventToAvro(SwitchSensorEvent event) {
+        SwitchSensorEventAvro payload = SwitchSensorEventAvro.newBuilder()
+                .setId(event.getId())
+                .setHubId(event.getHubId())
+                .setTimestamp(event.getTimestamp())
+                .setState(event.getState())
+                .build();
+
+        return SensorEventAvro.newBuilder()
+                .setId(event.getId())
+                .setHubId(event.getHubId())
+                .setTimestamp(event.getTimestamp())
+                .setPayload(payload)
+                .build();
     }
 
     private static SpecificRecordBase temperatureSensorEventToAvro(TemperatureSensorEvent event) {
-        return TemperatureSensorAvro.newBuilder()
+        TemperatureSensorEventAvro payload = TemperatureSensorEventAvro.newBuilder()
                 .setId(event.getId())
                 .setHubId(event.getHubId())
                 .setTimestamp(event.getTimestamp())
                 .setTemperatureC(event.getTemperatureC())
                 .setTemperatureF(event.getTemperatureF())
+                .build();
+
+        return SensorEventAvro.newBuilder()
+                .setId(event.getId())
+                .setHubId(event.getHubId())
+                .setTimestamp(event.getTimestamp())
+                .setPayload(payload)
                 .build();
     }
 }

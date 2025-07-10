@@ -29,47 +29,71 @@ public class AvroHubMapper {
     }
 
     private static SpecificRecordBase deviceAddEventToAvro(DeviceAddedEvent event) {
-        return DeviceAddedEventAvro.newBuilder()
+        DeviceAddedEventAvro payload = DeviceAddedEventAvro.newBuilder()
                 .setId(event.getId())
                 .setHubId(event.getHubId())
                 .setTimestamp(event.getTimestamp())
                 .setType(DeviceTypeAvro.valueOf(event.getDeviceType().name()))
                 .build();
+
+        return HubEventAvro.newBuilder()
+                .setHubId(event.getHubId())
+                .setTimestamp(event.getTimestamp())
+                .setPayload(payload)
+                .build();
     }
 
     private static SpecificRecordBase deviceRemoveEventToAvro(DeviceRemovedEvent event) {
-        return DeviceRemovedEventAvro.newBuilder()
+        DeviceRemovedEventAvro payload = DeviceRemovedEventAvro.newBuilder()
                 .setId(event.getId())
                 .setHubId(event.getHubId())
                 .setTimestamp(event.getTimestamp())
                 .build();
+
+        return HubEventAvro.newBuilder()
+                .setHubId(event.getHubId())
+                .setTimestamp(event.getTimestamp())
+                .setPayload(payload)
+                .build();
     }
 
     private static SpecificRecordBase scenarioAddedEventToAvro(ScenarioAddedEvent event) {
-        return ScenarioAddedEventAvro.newBuilder()
+        ScenarioAddedEventAvro payload = ScenarioAddedEventAvro.newBuilder()
                 .setHubId(event.getHubId())
                 .setTimestamp(event.getTimestamp())
                 .setName(event.getName())
                 .setConditions(toListScenarioConditionAvro(event.getConditions()))
                 .setActions(toListDeviceActionAvro(event.getActions()))
                 .build();
+
+        return HubEventAvro.newBuilder()
+                .setHubId(event.getHubId())
+                .setTimestamp(event.getTimestamp())
+                .setPayload(payload)
+                .build();
     }
 
     private static SpecificRecordBase scenarioRemovedEventToAvro(ScenarioRemovedEvent event) {
-        return ScenarioRemovedEventAvro.newBuilder()
+        ScenarioRemovedEventAvro payload = ScenarioRemovedEventAvro.newBuilder()
                 .setHubId(event.getHubId())
                 .setTimestamp(event.getTimestamp())
                 .setName(event.getName())
                 .build();
+
+        return HubEventAvro.newBuilder()
+                .setHubId(event.getHubId())
+                .setTimestamp(event.getTimestamp())
+                .setPayload(payload)
+                .build();
     }
 
-    private static List<DeviceActionAvro> toListDeviceActionAvro(List<DeviceAction> actions){
+    private static List<DeviceActionAvro> toListDeviceActionAvro(List<DeviceAction> actions) {
         return actions.stream()
-                .map(AvroHubMapper :: toDeviceActionAvro)
+                .map(AvroHubMapper::toDeviceActionAvro)
                 .collect(Collectors.toList());
     }
 
-    private static DeviceActionAvro toDeviceActionAvro(DeviceAction action){
+    private static DeviceActionAvro toDeviceActionAvro(DeviceAction action) {
         return DeviceActionAvro.newBuilder()
                 .setSensorId(action.getSensorId())
                 .setValue(action.getValue())
@@ -77,13 +101,13 @@ public class AvroHubMapper {
                 .build();
     }
 
-    private static List<ScenarioConditionAvro> toListScenarioConditionAvro(List<ScenarioCondition> conditions){
+    private static List<ScenarioConditionAvro> toListScenarioConditionAvro(List<ScenarioCondition> conditions) {
         return conditions.stream()
-                .map(AvroHubMapper :: toScenarioConditionAvro)
+                .map(AvroHubMapper::toScenarioConditionAvro)
                 .collect(Collectors.toList());
     }
 
-    private static ScenarioConditionAvro toScenarioConditionAvro(ScenarioCondition condition){
+    private static ScenarioConditionAvro toScenarioConditionAvro(ScenarioCondition condition) {
         return ScenarioConditionAvro.newBuilder()
                 .setSensorId(condition.getSensorId())
                 .setValue(condition.getValue())
