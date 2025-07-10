@@ -1,6 +1,5 @@
 package ru.yandex.practicum.collector.kafka;
 
-import ru.yandex.practicum.collector.kafka.serializer.EventAvroSerializer;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -9,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import ru.yandex.practicum.collector.kafka.serializer.EventAvroSerializer;
 
 import java.util.HashMap;
 import java.util.Map;

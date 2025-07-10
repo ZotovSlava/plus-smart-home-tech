@@ -8,12 +8,12 @@ import org.springframework.context.annotation.Configuration;
 public class KafkaTopicConfig {
 
     @Bean
-    public NewTopic sensorsTopic(){
+    public NewTopic sensorsTopic() {
         return new NewTopic("telemetry.sensors.v1", 10, (short) 1);
     }
 
     @Bean
-    public NewTopic hubsTopic(){
+    public NewTopic hubsTopic() {
         return new NewTopic("telemetry.hubs.v1", 2, (short) 3);
     }
 }

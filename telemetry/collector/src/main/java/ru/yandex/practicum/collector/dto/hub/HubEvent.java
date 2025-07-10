@@ -2,14 +2,14 @@ package ru.yandex.practicum.collector.dto.hub;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import ru.yandex.practicum.collector.dto.hub.device.DeviceAddedEvent;
-import ru.yandex.practicum.collector.dto.hub.device.DeviceRemovedEvent;
-import ru.yandex.practicum.collector.dto.hub.scenario.ScenarioAddedEvent;
-import ru.yandex.practicum.collector.dto.hub.scenario.ScenarioRemovedEvent;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import ru.yandex.practicum.collector.dto.hub.device.DeviceAddedEvent;
+import ru.yandex.practicum.collector.dto.hub.device.DeviceRemovedEvent;
+import ru.yandex.practicum.collector.dto.hub.scenario.ScenarioAddedEvent;
+import ru.yandex.practicum.collector.dto.hub.scenario.ScenarioRemovedEvent;
 
 import java.time.Instant;
 

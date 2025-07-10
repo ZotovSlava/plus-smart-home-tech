@@ -24,15 +24,13 @@ public class AvroHubMapper {
             case DEVICE_REMOVED -> deviceRemoveEventToAvro((DeviceRemovedEvent) hubEvent);
             case SCENARIO_ADDED -> scenarioAddedEventToAvro((ScenarioAddedEvent) hubEvent);
             case SCENARIO_REMOVED -> scenarioRemovedEventToAvro((ScenarioRemovedEvent) hubEvent);
-            default -> throw new IllegalArgumentException("Unknown action type: " + type);
+            default -> throw new IllegalArgumentException("Unknown event type: " + type);
         };
     }
 
     private static SpecificRecordBase deviceAddEventToAvro(DeviceAddedEvent event) {
         DeviceAddedEventAvro payload = DeviceAddedEventAvro.newBuilder()
                 .setId(event.getId())
-                .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp())
                 .setType(DeviceTypeAvro.valueOf(event.getDeviceType().name()))
                 .build();
 
@@ -46,8 +44,6 @@ public class AvroHubMapper {
     private static SpecificRecordBase deviceRemoveEventToAvro(DeviceRemovedEvent event) {
         DeviceRemovedEventAvro payload = DeviceRemovedEventAvro.newBuilder()
                 .setId(event.getId())
-                .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp())
                 .build();
 
         return HubEventAvro.newBuilder()
@@ -59,8 +55,6 @@ public class AvroHubMapper {
 
     private static SpecificRecordBase scenarioAddedEventToAvro(ScenarioAddedEvent event) {
         ScenarioAddedEventAvro payload = ScenarioAddedEventAvro.newBuilder()
-                .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp())
                 .setName(event.getName())
                 .setConditions(toListScenarioConditionAvro(event.getConditions()))
                 .setActions(toListDeviceActionAvro(event.getActions()))
@@ -75,8 +69,6 @@ public class AvroHubMapper {
 
     private static SpecificRecordBase scenarioRemovedEventToAvro(ScenarioRemovedEvent event) {
         ScenarioRemovedEventAvro payload = ScenarioRemovedEventAvro.newBuilder()
-                .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp())
                 .setName(event.getName())
                 .build();
 
@@ -84,20 +76,6 @@ public class AvroHubMapper {
                 .setHubId(event.getHubId())
                 .setTimestamp(event.getTimestamp())
                 .setPayload(payload)
-                .build();
-    }
-
-    private static List<DeviceActionAvro> toListDeviceActionAvro(List<DeviceAction> actions) {
-        return actions.stream()
-                .map(AvroHubMapper::toDeviceActionAvro)
-                .collect(Collectors.toList());
-    }
-
-    private static DeviceActionAvro toDeviceActionAvro(DeviceAction action) {
-        return DeviceActionAvro.newBuilder()
-                .setSensorId(action.getSensorId())
-                .setValue(action.getValue())
-                .setType(ActionTypeAvro.valueOf(action.getType().name()))
                 .build();
     }
 
@@ -110,9 +88,23 @@ public class AvroHubMapper {
     private static ScenarioConditionAvro toScenarioConditionAvro(ScenarioCondition condition) {
         return ScenarioConditionAvro.newBuilder()
                 .setSensorId(condition.getSensorId())
-                .setValue(condition.getValue())
                 .setType(ConditionTypeAvro.valueOf(condition.getType().name()))
                 .setOperation(ConditionOperationAvro.valueOf(condition.getOperation().name()))
+                .setValue(condition.getValue())
+                .build();
+    }
+
+    private static List<DeviceActionAvro> toListDeviceActionAvro(List<DeviceAction> actions) {
+        return actions.stream()
+                .map(AvroHubMapper::toDeviceActionAvro)
+                .collect(Collectors.toList());
+    }
+
+    private static DeviceActionAvro toDeviceActionAvro(DeviceAction action) {
+        return DeviceActionAvro.newBuilder()
+                .setSensorId(action.getSensorId())
+                .setType(ActionTypeAvro.valueOf(action.getType().name()))
+                .setValue(action.getValue())
                 .build();
     }
 }
