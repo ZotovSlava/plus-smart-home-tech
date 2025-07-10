@@ -1,49 +1,34 @@
 @namespace("ru.yandex.practicum.kafka.telemetry.event")
 protocol SensorEventProtocol {
-	record ClimateSensorEventAvro {
-		string id;
-		string hubId;
-		@logicalType("timestamp-millis")
-		long timestamp;
-		int temperatureC;
+
+	record ClimateSensorAvro {
+		int temperature_c;
 		int humidity;
-		int co2Level;
+		int co2_level;
 	}
 
-	record LightSensorEventAvro {
-		string id;
-		string hubId;
-		@logicalType("timestamp-millis")
-		long timestamp;
-		int linkQuality;
+	record LightSensorAvro {
+		int link_quality;
 		int luminosity;
 	}
 
-	record MotionSensorEventAvro {
-		string id;
-		string hubId;
-		@logicalType("timestamp-millis")
-		long timestamp;
-		int linkQuality;
+	record MotionSensorAvro {
+		int link_quality;
 		boolean motion;
 		int voltage;
 	}
 
-	record SwitchSensorEventAvro {
-		string id;
-		string hubId;
-		@logicalType("timestamp-millis")
-		long timestamp;
+	record SwitchSensorAvro {
 		boolean state;
 	}
 
-	record TemperatureSensorEventAvro {
+	record TemperatureSensorAvro {
 		string id;
 		string hubId;
 		@logicalType("timestamp-millis")
 		long timestamp;
-		int temperatureC;
-		int temperatureF;
+		int temperature_c;
+		int temperature_f;
 	}
 
 	record SensorEventAvro {
@@ -51,12 +36,12 @@ protocol SensorEventProtocol {
 		string hubId;
 		@logicalType("timestamp-millis")
 		long timestamp;
-		union{
-			ClimateSensorEventAvro,
-			LightSensorEventAvro,
-			MotionSensorEventAvro,
-			SwitchSensorEventAvro,
-			TemperatureSensorEventAvro
+		union {
+			ClimateSensorAvro,
+			LightSensorAvro,
+			MotionSensorAvro,
+			SwitchSensorAvro,
+			TemperatureSensorAvro
 		} payload;
 	}
 }

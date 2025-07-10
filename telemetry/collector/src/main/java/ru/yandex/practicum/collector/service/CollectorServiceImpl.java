@@ -1,8 +1,8 @@
 package ru.yandex.practicum.collector.service;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.yandex.practicum.collector.Mapper.AvroHubMapper;
-import ru.yandex.practicum.collector.Mapper.AvroSensorMapper;
+import ru.yandex.practicum.collector.mapper.AvroHubMapper;
+import ru.yandex.practicum.collector.mapper.AvroSensorMapper;
 import ru.yandex.practicum.collector.dto.hub.HubEvent;
 import ru.yandex.practicum.collector.dto.sensor.SensorEvent;
 import lombok.AllArgsConstructor;
@@ -19,8 +19,8 @@ public class CollectorServiceImpl implements CollectorService {
     @Override
     public void createEventFromSensor(SensorEvent sensorEvent) {
         SpecificRecordBase avroRecord = AvroSensorMapper.toAvro(sensorEvent);
-        log.info("Sending sensor event to Kafka: value={}", avroRecord);
-        kafkaTemplate.send("telemetry.sensors.v1", avroRecord)
+        log.info("Sending sensor event to Kafka: key={}, value={}", sensorEvent.getHubId(), avroRecord);
+        kafkaTemplate.send("telemetry.sensors.v1", sensorEvent.getHubId(), avroRecord)
                 .whenComplete((result, ex) -> {
                     if (ex != null) {
                         log.error("Failed to send sensor event to Kafka", ex);
@@ -36,8 +36,8 @@ public class CollectorServiceImpl implements CollectorService {
     @Override
     public void createEventFromHub(HubEvent hubEvent) {
         SpecificRecordBase avroRecord = AvroHubMapper.toAvro(hubEvent);
-        log.info("Sending hub event to Kafka: value={}", avroRecord);
-        kafkaTemplate.send("telemetry.hubs.v1", avroRecord)
+        log.info("Sending hub event to Kafka: key={}, value={}", hubEvent.getHubId(), avroRecord);
+        kafkaTemplate.send("telemetry.hubs.v1", hubEvent.getHubId(), avroRecord)
                 .whenComplete((result, ex) -> {
                     if (ex != null) {
                         log.error("Failed to send hub event to Kafka", ex);
