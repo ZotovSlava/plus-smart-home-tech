@@ -34,10 +34,16 @@ protocol HubEventProtocol {
 	record DeviceAddedEventAvro {
 		string id;
 		DeviceTypeAvro type;
+		string hub_id;
+		@logicalType("timestamp-millis")
+		long timestamp;
 	}
 
 	record DeviceRemovedEventAvro {
 		string id;
+		string hub_id;
+		@logicalType("timestamp-millis")
+		long timestamp;
 	}
 
 	record ScenarioConditionAvro {
@@ -50,22 +56,28 @@ protocol HubEventProtocol {
 	record DeviceActionAvro {
 		string sensor_id;
 		ActionTypeAvro type;
-		union { null, int } value = null;
+		union { null, int } value = null; //
 	}
 
 	record ScenarioAddedEventAvro {
 		string name;
 		array<ScenarioConditionAvro> conditions;
 		array<DeviceActionAvro> actions;
+		string hub_id;
+		@logicalType("timestamp-millis")
+		long timestamp;
 	}
 
 	record ScenarioRemovedEventAvro {
 		string name;
+		string hub_id;
+		@logicalType("timestamp-millis")
+		long timestamp;
 	}
 
 	record HubEventAvro {
 		string hub_id;
-		@logicalType("timestamp-millis")
+		@logicalType("timestamp-millis") //
 		long timestamp;
 		union {
 			DeviceAddedEventAvro,
