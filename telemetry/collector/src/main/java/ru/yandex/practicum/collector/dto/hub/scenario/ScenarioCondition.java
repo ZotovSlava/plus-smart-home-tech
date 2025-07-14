@@ -1,10 +1,10 @@
 package ru.yandex.practicum.collector.dto.hub.scenario;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
-@Setter
+@SuperBuilder
 @Getter
 @ToString
 public class ScenarioCondition {
