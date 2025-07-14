@@ -27,7 +27,8 @@ public class ProtoSensorMapper {
         return ClimateSensorEvent.builder()
                 .id(proto.getId())
                 .hubId(proto.getHubId())
-                .timestamp(Instant.ofEpochSecond(proto.getTimestamp().getSeconds()))
+                .timestamp(Instant.ofEpochSecond( proto.getTimestamp().getSeconds(),
+                        proto.getTimestamp().getNanos()))
                 .temperatureC(payload.getTemperatureC())
                 .humidity(payload.getHumidity())
                 .co2Level(payload.getCo2Level())
@@ -39,7 +40,8 @@ public class ProtoSensorMapper {
         return LightSensorEvent.builder()
                 .id(proto.getId())
                 .hubId(proto.getHubId())
-                .timestamp(Instant.ofEpochSecond(proto.getTimestamp().getSeconds()))
+                .timestamp(Instant.ofEpochSecond( proto.getTimestamp().getSeconds(),
+                        proto.getTimestamp().getNanos()))
                 .linkQuality(payload.getLinkQuality())
                 .luminosity(payload.getLuminosity())
                 .build();
@@ -50,7 +52,8 @@ public class ProtoSensorMapper {
         return MotionSensorEvent.builder()
                 .id(proto.getId())
                 .hubId(proto.getHubId())
-                .timestamp(Instant.ofEpochSecond(proto.getTimestamp().getSeconds()))
+                .timestamp(Instant.ofEpochSecond( proto.getTimestamp().getSeconds(),
+                        proto.getTimestamp().getNanos()))
                 .linkQuality(payload.getLinkQuality())
                 .voltage(payload.getVoltage())
                 .motion(payload.getMotion())
@@ -62,7 +65,8 @@ public class ProtoSensorMapper {
         return SwitchSensorEvent.builder()
                 .id(proto.getId())
                 .hubId(proto.getHubId())
-                .timestamp(Instant.ofEpochSecond(proto.getTimestamp().getSeconds()))
+                .timestamp(Instant.ofEpochSecond( proto.getTimestamp().getSeconds(),
+                        proto.getTimestamp().getNanos()))
                 .state(payload.getState())
                 .build();
     }
@@ -72,7 +76,8 @@ public class ProtoSensorMapper {
         return TemperatureSensorEvent.builder()
                 .id(proto.getId())
                 .hubId(proto.getHubId())
-                .timestamp(Instant.ofEpochSecond(proto.getTimestamp().getSeconds()))
+                .timestamp(Instant.ofEpochSecond( proto.getTimestamp().getSeconds(),
+                        proto.getTimestamp().getNanos()))
                 .temperatureC(payload.getTemperatureC())
                 .temperatureF(payload.getTemperatureF())
                 .build();

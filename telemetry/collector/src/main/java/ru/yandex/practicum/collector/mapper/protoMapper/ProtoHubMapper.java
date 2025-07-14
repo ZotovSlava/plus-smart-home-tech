@@ -31,7 +31,8 @@ public class ProtoHubMapper {
 
         return DeviceAddedEvent.builder()
                 .hubId(proto.getHubId())
-                .timestamp(Instant.ofEpochSecond(proto.getTimestamp().getSeconds()))
+                .timestamp(Instant.ofEpochSecond( proto.getTimestamp().getSeconds(),
+                        proto.getTimestamp().getNanos()))
                 .id(payload.getId())
                 .deviceType(DeviceType.valueOf(payload.getType().name()))
                 .build();
@@ -43,7 +44,8 @@ public class ProtoHubMapper {
 
         return DeviceRemovedEvent.builder()
                 .hubId(proto.getHubId())
-                .timestamp(Instant.ofEpochSecond(proto.getTimestamp().getSeconds()))
+                .timestamp(Instant.ofEpochSecond( proto.getTimestamp().getSeconds(),
+                        proto.getTimestamp().getNanos()))
                 .id(payload.getId())
                 .build();
     }
@@ -53,7 +55,8 @@ public class ProtoHubMapper {
 
         return ScenarioAddedEvent.builder()
                 .hubId(proto.getHubId())
-                .timestamp(Instant.ofEpochSecond(proto.getTimestamp().getSeconds()))
+                .timestamp(Instant.ofEpochSecond( proto.getTimestamp().getSeconds(),
+                        proto.getTimestamp().getNanos()))
                 .name(payload.getName())
                 .conditions(getScenarioConditionList(payload.getConditionList()))
                 .actions(getDeviceActionList(payload.getActionList()))
@@ -65,7 +68,8 @@ public class ProtoHubMapper {
 
         return ScenarioRemovedEvent.builder()
                 .hubId(proto.getHubId())
-                .timestamp(Instant.ofEpochSecond(proto.getTimestamp().getSeconds()))
+                .timestamp(Instant.ofEpochSecond( proto.getTimestamp().getSeconds(),
+                        proto.getTimestamp().getNanos()))
                 .name(payload.getName())
                 .build();
     }
