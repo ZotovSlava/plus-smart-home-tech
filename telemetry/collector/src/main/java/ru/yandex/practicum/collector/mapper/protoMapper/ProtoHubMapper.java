@@ -87,19 +87,33 @@ public class ProtoHubMapper {
     }
 
     private static DeviceAction toDeviceAction(DeviceActionProto deviceActionProto) {
+        Integer value = null;
+        switch (deviceActionProto.getValueCase()) {
+            case INT_VALUE -> value = deviceActionProto.getIntValue();
+            case BOOL_VALUE -> value = deviceActionProto.getBoolValue() ? 1 : 0;
+            case VALUE_NOT_SET -> value = null;
+        }
+
         return DeviceAction.builder()
                 .sensorId(deviceActionProto.getSensorId())
                 .type(DeviceActionType.valueOf(deviceActionProto.getType().name()))
-                .value(deviceActionProto.getIntValue())
+                .value(value)
                 .build();
     }
 
     private static ScenarioCondition toScenarioCondition(ScenarioConditionProto scenarioConditionProto) {
+        Integer value = null;
+        switch (scenarioConditionProto.getValueCase()) {
+            case INT_VALUE -> value = scenarioConditionProto.getIntValue();
+            case BOOL_VALUE -> value = scenarioConditionProto.getBoolValue() ? 1 : 0;
+            case VALUE_NOT_SET -> value = null;
+        }
+
         return ScenarioCondition.builder()
                 .sensorId(scenarioConditionProto.getSensorId())
                 .type(ScenarioConditionType.valueOf(scenarioConditionProto.getType().name()))
                 .operation(ScenarioConditionOperation.valueOf(scenarioConditionProto.getOperation().name()))
-                .value(scenarioConditionProto.getIntValue())
+                .value(value)
                 .build();
     }
 }
