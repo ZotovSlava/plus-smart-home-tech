@@ -90,7 +90,7 @@ public class ProtoHubMapper {
         return DeviceAction.builder()
                 .sensorId(deviceActionProto.getSensorId())
                 .type(DeviceActionType.valueOf(deviceActionProto.getType().name()))
-                .value(deviceActionProto.getValue())
+                .value(deviceActionProto.getIntValue())
                 .build();
     }
 
