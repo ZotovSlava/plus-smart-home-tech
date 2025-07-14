@@ -99,7 +99,7 @@ public class ProtoHubMapper {
                 .sensorId(scenarioConditionProto.getSensorId())
                 .type(ScenarioConditionType.valueOf(scenarioConditionProto.getType().name()))
                 .operation(ScenarioConditionOperation.valueOf(scenarioConditionProto.getOperation().name()))
-                .value(scenarioConditionProto.getValue())
+                .value(scenarioConditionProto.getIntValue())
                 .build();
     }
 }
