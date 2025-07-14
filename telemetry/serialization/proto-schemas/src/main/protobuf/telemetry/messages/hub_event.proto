@@ -55,7 +55,7 @@ message ScenarioConditionProto {
   string sensor_id = 1;
   ConditionTypeProto type = 2;
   ConditionOperationProto operation = 3;
-  optional int32 value = 4;
+  int32 value = 4;
 }
 
 enum ActionTypeProto {
@@ -68,7 +68,7 @@ enum ActionTypeProto {
 message DeviceActionProto {
   string sensor_id = 1;
   ActionTypeProto type = 2;
-  optional int32 value = 3;
+  int32 value = 3;
 }
 
 message ScenarioAddedEventProto {
