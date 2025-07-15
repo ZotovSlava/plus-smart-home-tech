@@ -1,4 +1,4 @@
-package ru.yandex.practicum.collector.mapper;
+package ru.yandex.practicum.collector.mapper.avroMapper;
 
 
 import org.apache.avro.specific.SpecificRecordBase;
