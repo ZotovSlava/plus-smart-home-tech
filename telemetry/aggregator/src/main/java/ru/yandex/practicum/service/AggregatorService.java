@@ -27,7 +27,7 @@ public class AggregatorService {
             SensorsSnapshotAvro snapshotAvro = snapshot.get();
             log.info("Новый снапшот сформирован: {}", snapshotAvro);
 
-            sensorEventProducer.send(event.getId().toString(), snapshotAvro);
+            sensorEventProducer.send(event.getHubId(), snapshotAvro);
         } else {
             log.info("Снапшот не обновился.");
         }

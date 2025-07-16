@@ -18,19 +18,21 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class InMemorySensorEvents {
 
-    private final Map<String, SensorsSnapshotAvro> snapshots = new HashMap<>();
+    private final Map<String, SensorsSnapshotAvro> snapshots;
 
     public Optional<SensorsSnapshotAvro> updateState(SensorEventAvro event) {
         String hubId = event.getHubId();
         String sensorId = event.getId();
 
-        log.info("▶Обработка события от сенсора {} хаба {}", sensorId, hubId);
+        log.info("▶ Обработка события от сенсора {} хаба {}", sensorId, hubId);
 
         SensorsSnapshotAvro oldSnapshot = snapshots.get(hubId);
 
         if (oldSnapshot == null) {
             log.info("Снапшот для хаба {} не найден. Создаём новый.", hubId);
-            return Optional.of(createNewSnapshot(event));
+            SensorsSnapshotAvro newSnapshot = createNewSnapshot(event);
+            snapshots.put(hubId, newSnapshot);
+            return Optional.of(newSnapshot);
         }
 
         SensorStateAvro existingState = oldSnapshot.getSensorsState().get(sensorId);
@@ -52,41 +54,26 @@ public class InMemorySensorEvents {
                 .setData(event.getPayload())
                 .build();
 
-        Map<String, SensorStateAvro> newSensorsState = new HashMap<>(oldSnapshot.getSensorsState());
-        newSensorsState.put(sensorId, newState);
+        oldSnapshot.setTimestamp(event.getTimestamp());
+        oldSnapshot.getSensorsState().put(sensorId, newState);
 
-        SensorsSnapshotAvro newSnapshot = SensorsSnapshotAvro.newBuilder()
-                .setHubId(hubId)
-                .setTimestamp(event.getTimestamp())
-                .setSensorsState(newSensorsState)
-                .build();
+        log.info("Новый снапшот: {}", oldSnapshot);
 
-        snapshots.put(hubId, newSnapshot);
-
-        log.info("Новый снапшот: {}", newSnapshot);
-
-        return Optional.of(newSnapshot);
+        return Optional.of(oldSnapshot);
     }
 
     private SensorsSnapshotAvro createNewSnapshot(SensorEventAvro event) {
-        String hubId = event.getHubId();
-        String sensorId = event.getId();
-
-        SensorStateAvro newState = SensorStateAvro.newBuilder()
+        Map<String, SensorStateAvro> sensorMap = new HashMap<>();
+        sensorMap.put(event.getId(), SensorStateAvro.newBuilder()
                 .setTimestamp(event.getTimestamp())
                 .setData(event.getPayload())
-                .build();
-
-        Map<String, SensorStateAvro> sensorMap = new HashMap<>();
-        sensorMap.put(sensorId, newState);
+                .build());
 
         SensorsSnapshotAvro snapshot = SensorsSnapshotAvro.newBuilder()
-                .setHubId(hubId)
+                .setHubId(event.getHubId())
                 .setTimestamp(event.getTimestamp())
                 .setSensorsState(sensorMap)
                 .build();
-
-        snapshots.put(hubId, snapshot);
 
         log.info("Новый снапшот создан: {}", snapshot);
         return snapshot;
