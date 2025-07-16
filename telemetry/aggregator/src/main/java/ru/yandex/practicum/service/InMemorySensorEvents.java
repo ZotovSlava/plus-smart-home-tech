@@ -26,37 +26,46 @@ public class InMemorySensorEvents {
 
         log.info("▶Обработка события от сенсора {} хаба {}", sensorId, hubId);
 
-        SensorsSnapshotAvro snapshot = snapshots.get(hubId);
+        SensorsSnapshotAvro oldSnapshot = snapshots.get(hubId);
 
-        if (snapshot == null) {
+        if (oldSnapshot == null) {
             log.info("Снапшот для хаба {} не найден. Создаём новый.", hubId);
             return Optional.of(createNewSnapshot(event));
         }
 
-        SensorStateAvro existingState = snapshot.getSensorsState().get(sensorId);
+        SensorStateAvro existingState = oldSnapshot.getSensorsState().get(sensorId);
 
         if (existingState != null) {
             log.info("Найдено предыдущее состояние сенсора {}: {}", sensorId, existingState);
 
-            // Сравнение по времени и данным
             if (existingState.getTimestamp().compareTo(event.getTimestamp()) >= 0 ||
-                    existingState.getData().toString().equals(event.getPayload().toString())) {
+                    existingState.getData().equals(event.getPayload())) {
                 log.info("⏸ Состояние не изменилось. Пропускаем обновление.");
                 return Optional.empty();
             }
         }
 
         log.info("Обновляем состояние сенсора {}", sensorId);
+
         SensorStateAvro newState = SensorStateAvro.newBuilder()
                 .setTimestamp(event.getTimestamp())
                 .setData(event.getPayload())
                 .build();
 
-        snapshot.setTimestamp(event.getTimestamp());
-        snapshot.getSensorsState().put(sensorId, newState);
-        log.info("Новый снапшот: {}", snapshot);
+        Map<String, SensorStateAvro> newSensorsState = new HashMap<>(oldSnapshot.getSensorsState());
+        newSensorsState.put(sensorId, newState);
 
-        return Optional.of(snapshot);
+        SensorsSnapshotAvro newSnapshot = SensorsSnapshotAvro.newBuilder()
+                .setHubId(hubId)
+                .setTimestamp(event.getTimestamp())
+                .setSensorsState(newSensorsState)
+                .build();
+
+        snapshots.put(hubId, newSnapshot);
+
+        log.info("Новый снапшот: {}", newSnapshot);
+
+        return Optional.of(newSnapshot);
     }
 
     private SensorsSnapshotAvro createNewSnapshot(SensorEventAvro event) {
