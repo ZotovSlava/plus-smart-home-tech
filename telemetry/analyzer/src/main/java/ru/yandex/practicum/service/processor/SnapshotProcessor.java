@@ -5,6 +5,7 @@ import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 import ru.yandex.practicum.service.handler.SnapshotService;
@@ -17,12 +18,17 @@ import java.util.Map;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class SnapshotProcessor implements Runnable {
 
     private static final Duration POLL_TIMEOUT = Duration.ofMillis(100);
     private final SnapshotService snapshotService;
     private final KafkaConsumer<String, SpecificRecordBase> consumer;
+
+    public SnapshotProcessor(SnapshotService snapshotService,
+                             @Qualifier("snapshotConsumer") KafkaConsumer<String, SpecificRecordBase> consumer) {
+        this.snapshotService = snapshotService;
+        this.consumer = consumer;
+    }
 
     private final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
 
