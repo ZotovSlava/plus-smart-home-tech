@@ -17,7 +17,7 @@ public class InMemorySensorEvents {
     private final Map<String, SensorsSnapshotAvro> snapshots = new HashMap<>();
 
     public Optional<SensorsSnapshotAvro> updateState(SensorEventAvro event) {
-        log.info("...... Список снапшотов: {}", snapshots.keySet());
+        log.info("Список снапшотов: {}", snapshots.keySet());
 
         String hubId = event.getHubId();
         String sensorId = event.getId();
@@ -25,29 +25,29 @@ public class InMemorySensorEvents {
         SensorsSnapshotAvro snapshot = snapshots.get(hubId);
 
         if (snapshot == null) {
-            log.info("...... снапшот не найден, создаем новый");
+            log.info("Cнапшот не найден, создаем новый");
             return Optional.of(addSnapshot(event));
         }
 
-        log.info("...... снапшот найден: {}", hubId);
+        log.info("Cнапшот найден: {}", hubId);
 
         SensorStateAvro existingState = snapshot.getSensorsState().get(sensorId);
 
         if (existingState != null) {
-            log.info("...... предыдущее состояние найдено {}", existingState);
-            log.info("...... сравнение времени: старого {} и нового {}", existingState.getTimestamp(), event.getTimestamp());
+            log.info("предыдущее состояние найдено {}", existingState);
+            log.info("сравнение времени: старого {} и нового {}", existingState.getTimestamp(), event.getTimestamp());
 
             String oldData = existingState.getData().toString();
             String newData = event.getPayload().toString();
 
             if (existingState.getTimestamp().isAfter(event.getTimestamp()) || oldData.equals(newData)) {
-                log.info("...... предыдущее состояние не изменилось");
+                log.info("предыдущее состояние не изменилось");
                 return Optional.empty();
             }
 
-            log.info("...... обновление состояния");
+            log.info("обновление состояния");
         } else {
-            log.info("...... новое состояние для сенсора, добавляем");
+            log.info("новое состояние для сенсора, добавляем");
         }
 
         SensorStateAvro newState = SensorStateAvro.newBuilder()
@@ -58,7 +58,7 @@ public class InMemorySensorEvents {
         snapshot.getSensorsState().put(sensorId, newState);
         snapshot.setTimestamp(event.getTimestamp());
 
-        log.info("...... обновленный снапшот: {}", snapshot);
+        log.info("обновленный снапшот: {}", snapshot);
 
         return Optional.of(snapshot);
     }
@@ -80,7 +80,7 @@ public class InMemorySensorEvents {
 
         snapshots.put(event.getHubId(), snapshot);
 
-        log.info("...... создан новый снапшот: {}", snapshot);
+        log.info("создан новый снапшот: {}", snapshot);
 
         return snapshot;
     }

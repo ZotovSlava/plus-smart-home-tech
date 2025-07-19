@@ -23,7 +23,7 @@ public class KafkaProperties {
         config.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         config.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
         config.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "ru.yandex.practicum.kafka.deserializer.SensorEventDeserializer");
-        config.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "consumer-client-" + UUID.randomUUID()); // Сомнительно, но Окей...
+        config.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "consumer-client-sensor");
         config.setProperty(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, "500");
 
         return config;
