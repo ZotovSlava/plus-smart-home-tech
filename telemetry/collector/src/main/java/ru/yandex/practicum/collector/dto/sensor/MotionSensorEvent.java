@@ -1,19 +1,15 @@
 package ru.yandex.practicum.collector.dto.sensor;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
+@SuperBuilder
 @Getter
-@Setter
 @ToString(callSuper = true)
 public class MotionSensorEvent extends SensorEvent {
-    @NotNull
     private Integer linkQuality;
-    @NotNull
     private Integer voltage;
-    @NotNull
     private Boolean motion;
 
     @Override

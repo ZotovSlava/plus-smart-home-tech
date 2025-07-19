@@ -7,8 +7,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.collector.dto.hub.HubEvent;
 import ru.yandex.practicum.collector.dto.sensor.SensorEvent;
-import ru.yandex.practicum.collector.mapper.AvroHubMapper;
-import ru.yandex.practicum.collector.mapper.AvroSensorMapper;
+import ru.yandex.practicum.collector.mapper.avroMapper.AvroHubMapper;
+import ru.yandex.practicum.collector.mapper.avroMapper.AvroSensorMapper;
 
 @Service
 @AllArgsConstructor
