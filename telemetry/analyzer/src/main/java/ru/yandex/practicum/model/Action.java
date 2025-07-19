@@ -18,6 +18,6 @@ public class Action {
     @Column(nullable = false)
     private String type;
 
-    @Column(nullable = false)
+    @Column
     private Long value;
 }

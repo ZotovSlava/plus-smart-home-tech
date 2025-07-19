@@ -7,9 +7,7 @@ import ru.yandex.practicum.kafka.telemetry.event.*;
 import ru.yandex.practicum.model.Action;
 import ru.yandex.practicum.model.Condition;
 import ru.yandex.practicum.model.Sensor;
-import ru.yandex.practicum.model.scenario.Scenario;
-import ru.yandex.practicum.model.scenario.ScenarioAction;
-import ru.yandex.practicum.model.scenario.ScenarioCondition;
+import ru.yandex.practicum.model.scenario.*;
 import ru.yandex.practicum.repository.ActionRepository;
 import ru.yandex.practicum.repository.ConditionRepository;
 import ru.yandex.practicum.repository.ScenarioRepository;
@@ -22,6 +20,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class HubService {
+
     private final SensorRepository sensorRepository;
     private final ConditionRepository conditionRepository;
     private final ActionRepository actionRepository;
@@ -39,18 +38,26 @@ public class HubService {
                 sensor.setId(event.getId());
                 sensor.setHubId(hubId);
                 sensorRepository.save(sensor);
+
+                log.info("✅ Добавлен сенсор: id={}, hubId={}", sensor.getId(), hubId);
             }
 
             case DeviceRemovedEventAvro event -> {
                 sensorRepository.findByIdAndHubId(event.getId(), hubId)
-                        .ifPresent(sensorRepository::delete);
+                        .ifPresent(sensor -> {
+                            sensorRepository.delete(sensor);
+                            log.info("🗑 Удалён сенсор: id={}, hubId={}", sensor.getId(), hubId);
+                        });
             }
 
             case ScenarioAddedEventAvro event -> {
+                log.info("⬆️ Получен запрос на добавление сценария: '{}' для хаба: {}", event.getName(), hubId);
 
                 Scenario scenario = new Scenario();
                 scenario.setHubId(hubId);
                 scenario.setName(event.getName());
+
+                scenarioRepository.save(scenario); // Сохраняем, чтобы получить id для внешних ключей
 
                 List<ScenarioCondition> scenarioConditions = new ArrayList<>();
                 List<ScenarioAction> scenarioActions = new ArrayList<>();
@@ -74,17 +81,36 @@ public class HubService {
 
                     ScenarioCondition sc = new ScenarioCondition();
 
+                    ScenarioConditionKey scKey = new ScenarioConditionKey();
+                    scKey.setScenarioId(scenario.getId());
+                    scKey.setSensorId(sensor.getId());
+                    scKey.setConditionId(newCondition.getId());
+                    sc.setId(scKey);
+
                     sc.setScenario(scenario);
                     sc.setSensor(sensor);
                     sc.setCondition(newCondition);
 
                     scenarioConditions.add(sc);
+
+                    log.info("  📝 Добавлено условие: sensorId={}, type={}, operation={}, value={}",
+                            sensor.getId(), newCondition.getType(), newCondition.getOperation(), newCondition.getValue());
                 }
 
                 for (DeviceActionAvro actionAvro : event.getActions()) {
                     Action newAction = new Action();
                     newAction.setType(actionAvro.getType().name());
-                    newAction.setValue(actionAvro.getValue().longValue());
+
+                    Integer value = actionAvro.getValue();
+
+                    if (actionAvro.getType() == ActionTypeAvro.SET_VALUE && value == null) {
+                        log.warn("⚠️ Для действия SET_VALUE поле value обязательно, но оно равно null. sensorId: {}", actionAvro.getSensorId());
+                        continue;
+                    }
+
+                    if (value != null) {
+                        newAction.setValue(value.longValue());
+                    }
 
                     actionRepository.save(newAction);
 
@@ -93,22 +119,36 @@ public class HubService {
 
                     ScenarioAction sa = new ScenarioAction();
 
+                    ScenarioActionKey saKey = new ScenarioActionKey();
+                    saKey.setScenarioId(scenario.getId());
+                    saKey.setSensorId(sensor.getId());
+                    saKey.setActionId(newAction.getId());
+                    sa.setId(saKey);
+
                     sa.setScenario(scenario);
                     sa.setSensor(sensor);
                     sa.setAction(newAction);
 
                     scenarioActions.add(sa);
+
+                    log.info("  🛠 Добавлено действие: sensorId={}, type={}, value={}",
+                            sensor.getId(), newAction.getType(), newAction.getValue());
                 }
 
                 scenario.setConditions(scenarioConditions);
                 scenario.setActions(scenarioActions);
 
                 scenarioRepository.save(scenario);
+
+                log.info("✅ Сценарий '{}' успешно сохранён для хаба: {}", scenario.getName(), hubId);
             }
 
             case ScenarioRemovedEventAvro event -> {
                 scenarioRepository.findByHubIdAndName(hubId, event.getName())
-                        .ifPresent(scenarioRepository::delete);
+                        .ifPresent(scenario -> {
+                            scenarioRepository.delete(scenario);
+                            log.info("🗑 Удалён сценарий: '{}' для хаба: {}", event.getName(), hubId);
+                        });
             }
 
             default -> log.info("Неизвестный класс объекта: {}", payload.getClass().getSimpleName());
