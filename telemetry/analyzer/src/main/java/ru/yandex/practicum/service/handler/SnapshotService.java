@@ -61,7 +61,6 @@ public class SnapshotService {
 
                 List<Integer> switchExecution = new ArrayList<>();
 
-                // Проверка наличия сенсоров в БД
                 boolean sensorsExist = sensorRepository.existsByIdInAndHubId(sensorsState.keySet(), hubId);
                 log.info("🔎 Сенсоры из snapshot существуют в БД для хаба {}: {}", hubId, sensorsExist);
                 if (!sensorsExist) {
@@ -155,12 +154,10 @@ public class SnapshotService {
     }
 
     private boolean compareBooleanCondition(String operation, Long expectedValue, boolean actual) {
-        log.trace("⚖️ Сравнение булево: expected={}, actual={}, operation={}", expectedValue, actual, operation);
         return "EQUALS".equals(operation) && ((expectedValue == 1 && actual) || (expectedValue == 0 && !actual));
     }
 
     private boolean compareNumericCondition(String operation, Long expectedValue, int actualValue) {
-        log.trace("⚖️ Сравнение чисел: expected={}, actual={}, operation={}", expectedValue, actualValue, operation);
         return switch (operation) {
             case "EQUALS" -> expectedValue == actualValue;
             case "GREATER_THAN" -> expectedValue < actualValue;

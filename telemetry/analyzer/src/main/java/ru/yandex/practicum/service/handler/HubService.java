@@ -57,7 +57,7 @@ public class HubService {
                 scenario.setHubId(hubId);
                 scenario.setName(event.getName());
 
-                scenarioRepository.save(scenario); // Сохраняем, чтобы получить id для внешних ключей
+                scenarioRepository.save(scenario);
 
                 List<ScenarioCondition> scenarioConditions = new ArrayList<>();
                 List<ScenarioAction> scenarioActions = new ArrayList<>();
@@ -131,7 +131,7 @@ public class HubService {
 
                     scenarioActions.add(sa);
 
-                    log.info("  🛠 Добавлено действие: sensorId={}, type={}, value={}",
+                    log.info("🛠 Добавлено действие: sensorId={}, type={}, value={}",
                             sensor.getId(), newAction.getType(), newAction.getValue());
                 }
 
