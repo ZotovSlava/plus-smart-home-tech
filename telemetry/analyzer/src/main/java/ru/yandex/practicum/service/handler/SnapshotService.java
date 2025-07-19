@@ -40,78 +40,62 @@ public class SnapshotService {
     }
 
     public void handleRecord(SensorsSnapshotAvro record) {
-        log.info("➡️ Обработка snapshot начата для хаба: {}", record.getHubId());
+        log.info("Обработка снимка для хаба: {}", record.getHubId());
 
         try {
             String hubId = record.getHubId();
-
             Map<String, SensorStateAvro> sensorsState = record.getSensorsState();
-            log.info("🔍 Количество состояний датчиков в snapshot: {}", sensorsState.size());
-
             List<Scenario> scenarios = scenarioRepository.findByHubId(hubId);
-            log.info("📊 Найдено сценариев для хаба {}: {}", hubId, scenarios.size());
 
             if (scenarios.isEmpty()) {
-                log.warn("⚠️ Нет сценариев для хаба {}", hubId);
+                log.warn("Сценарии не найдены для хаба {}", hubId);
+                return;
+            }
+
+            boolean sensorsExist = sensorRepository.existsByIdInAndHubId(sensorsState.keySet(), hubId);
+            if (!sensorsExist) {
+                log.warn("Подходящие сенсоры не найдены в БД для хаба {}", hubId);
+                return;
             }
 
             for (Scenario scenario : scenarios) {
                 String scenarioName = scenario.getName();
-                log.info("🧠 Обработка сценария: {}", scenarioName);
 
-                List<Integer> switchExecution = new ArrayList<>();
+                boolean allConditionsMet = scenario.getConditions().stream()
+                        .allMatch(scCondition -> {
+                            Condition condition = scCondition.getCondition();
+                            String sensorId = scCondition.getSensor().getId();
+                            SensorStateAvro state = sensorsState.get(sensorId);
+                            if (state == null) {
+                                log.warn("Нет состояния для сенсора {} в снимке", sensorId);
+                                return false;
+                            }
+                            return checkCondition(condition, state);
+                        });
 
-                boolean sensorsExist = sensorRepository.existsByIdInAndHubId(sensorsState.keySet(), hubId);
-                log.info("🔎 Сенсоры из snapshot существуют в БД для хаба {}: {}", hubId, sensorsExist);
-                if (!sensorsExist) {
-                    log.warn("⚠️ Нет подходящих сенсоров в БД для хаба {}", hubId);
-                    continue;
-                }
-
-                for (ScenarioCondition scCondition : scenario.getConditions()) {
-                    Condition condition = scCondition.getCondition();
-                    String sensorId = scCondition.getSensor().getId();
-
-                    log.debug("🔍 Проверка условия для сенсора {}", sensorId);
-                    SensorStateAvro state = sensorsState.get(sensorId);
-                    if (state == null) {
-                        log.warn("❌ Нет состояния для сенсора {} в snapshot", sensorId);
-                        switchExecution.add(0);
-                        continue;
-                    }
-
-                    boolean matched = checkCondition(condition, state);
-                    log.debug("✅ Условие для сенсора {} выполнено: {}", sensorId, matched);
-                    switchExecution.add(matched ? 1 : 0);
-                }
-
-                if (!switchExecution.isEmpty() && !switchExecution.contains(0)) {
-                    log.info("✅ Все условия выполнены для сценария {}", scenarioName);
+                if (allConditionsMet) {
+                    log.info("Все условия выполнены для сценария {}", scenarioName);
                     for (ScenarioAction scAction : scenario.getActions()) {
                         Action action = scAction.getAction();
                         String sensorId = scAction.getSensor().getId();
                         sendAction(hubId, scenarioName, sensorId, action);
                     }
                 } else {
-                    log.info("🚫 Условия не выполнены для сценария {}", scenarioName);
+                    log.info("Условия не выполнены для сценария {}", scenarioName);
                 }
             }
 
-            log.info("➡️ Обработка snapshot завершена для хаба: {}", hubId);
-
         } catch (Exception e) {
-            log.error("🛑 Ошибка при обработке snapshot для хаба {}", record.getHubId(), e);
+            log.error("Ошибка при обработке снимка для хаба {}: {}", record.getHubId(), e.getMessage(), e);
         }
     }
 
     private boolean checkCondition(Condition condition, SensorStateAvro state) {
-        String type = condition.getType();
-        String operation = condition.getOperation();
-        Long expectedValue = condition.getValue();
-
-        log.trace("🔎 Проверка условия: тип={}, операция={}, значение={}", type, operation, expectedValue);
-
         try {
+            String type = condition.getType();
+            String operation = condition.getOperation();
+            Long expectedValue = condition.getValue();
+
             return switch (type) {
                 case "SWITCH" -> {
                     SwitchSensorEventAvro data = (SwitchSensorEventAvro) state.getData();
@@ -139,16 +123,14 @@ public class SnapshotService {
                         yield compareNumericCondition(operation, expectedValue, tempData.getTemperatureC());
                     } else if (data instanceof ClimateSensorEventAvro climateData) {
                         yield compareNumericCondition(operation, expectedValue, climateData.getTemperatureC());
+                    } else {
+                        yield false;
                     }
-                    yield false;
                 }
-                default -> {
-                    log.warn("❓ Неизвестный тип условия: {}", type);
-                    yield false;
-                }
+                default -> false;
             };
         } catch (Exception e) {
-            log.error("🛑 Ошибка при проверке условия: {}", e.getMessage(), e);
+            log.error("Ошибка при проверке условия: {}", e.getMessage(), e);
             return false;
         }
     }
@@ -167,8 +149,7 @@ public class SnapshotService {
     }
 
     private void sendAction(String hubId, String scenarioName, String sensorId, Action action) {
-        log.info("📤 Отправка действия: хаб={}, сценарий={}, сенсор={}, тип={}",
-                hubId, scenarioName, sensorId, action.getType());
+        log.info("Отправка действия: хаб={}, сценарий={}, сенсор={}, тип={}", hubId, scenarioName, sensorId, action.getType());
 
         Instant time = Instant.now();
         Timestamp timestamp = Timestamp.newBuilder()
@@ -182,7 +163,6 @@ public class SnapshotService {
 
         if ("SET_VALUE".equals(action.getType())) {
             actionBuilder.setIntValue(action.getValue().intValue());
-            log.trace("🛠 Установка значения: {}", action.getValue());
         }
 
         DeviceActionRequest request = DeviceActionRequest.newBuilder()
@@ -194,9 +174,9 @@ public class SnapshotService {
 
         try {
             hubRouterClient.handleDeviceAction(request);
-            log.info("✅ Действие успешно отправлено!");
+            log.info("Действие успешно отправлено");
         } catch (Exception e) {
-            log.error("🚨 Ошибка при отправке действия для сенсора {}: {}", sensorId, e.getMessage(), e);
+            log.error("Ошибка при отправке действия для сенсора {}: {}", sensorId, e.getMessage(), e);
         }
     }
 }

@@ -30,7 +30,7 @@ public class HubService {
         Object payload = record.getPayload();
         String hubId = record.getHubId();
 
-        log.info("Добавление записи \"{}\" в таблицу. Класс объекта: \"{}\"", record, payload.getClass().getSimpleName());
+        log.info("Обработка записи типа \"{}\" для хаба {}", payload.getClass().getSimpleName(), hubId);
 
         switch (payload) {
             case DeviceAddedEventAvro event -> {
@@ -38,25 +38,23 @@ public class HubService {
                 sensor.setId(event.getId());
                 sensor.setHubId(hubId);
                 sensorRepository.save(sensor);
-
-                log.info("✅ Добавлен сенсор: id={}, hubId={}", sensor.getId(), hubId);
+                log.info("Добавлен сенсор: id={}, hubId={}", sensor.getId(), hubId);
             }
 
             case DeviceRemovedEventAvro event -> {
                 sensorRepository.findByIdAndHubId(event.getId(), hubId)
                         .ifPresent(sensor -> {
                             sensorRepository.delete(sensor);
-                            log.info("🗑 Удалён сенсор: id={}, hubId={}", sensor.getId(), hubId);
+                            log.info("Удалён сенсор: id={}, hubId={}", sensor.getId(), hubId);
                         });
             }
 
             case ScenarioAddedEventAvro event -> {
-                log.info("⬆️ Получен запрос на добавление сценария: '{}' для хаба: {}", event.getName(), hubId);
+                log.info("Добавление сценария '{}' для хаба {}", event.getName(), hubId);
 
                 Scenario scenario = new Scenario();
                 scenario.setHubId(hubId);
                 scenario.setName(event.getName());
-
                 scenarioRepository.save(scenario);
 
                 List<ScenarioCondition> scenarioConditions = new ArrayList<>();
@@ -77,10 +75,9 @@ public class HubService {
                     conditionRepository.save(newCondition);
 
                     Sensor sensor = sensorRepository.findById(condAvro.getSensorId())
-                            .orElseThrow(() -> new RuntimeException("Sensor not found: " + condAvro.getSensorId()));
+                            .orElseThrow(() -> new RuntimeException("Сенсор не найден: " + condAvro.getSensorId()));
 
                     ScenarioCondition sc = new ScenarioCondition();
-
                     ScenarioConditionKey scKey = new ScenarioConditionKey();
                     scKey.setScenarioId(scenario.getId());
                     scKey.setSensorId(sensor.getId());
@@ -93,7 +90,7 @@ public class HubService {
 
                     scenarioConditions.add(sc);
 
-                    log.info("  📝 Добавлено условие: sensorId={}, type={}, operation={}, value={}",
+                    log.info("Добавлено условие: sensorId={}, type={}, operation={}, value={}",
                             sensor.getId(), newCondition.getType(), newCondition.getOperation(), newCondition.getValue());
                 }
 
@@ -104,7 +101,7 @@ public class HubService {
                     Integer value = actionAvro.getValue();
 
                     if (actionAvro.getType() == ActionTypeAvro.SET_VALUE && value == null) {
-                        log.warn("⚠️ Для действия SET_VALUE поле value обязательно, но оно равно null. sensorId: {}", actionAvro.getSensorId());
+                        log.warn("Для действия SET_VALUE поле value обязательно, sensorId: {}", actionAvro.getSensorId());
                         continue;
                     }
 
@@ -115,10 +112,9 @@ public class HubService {
                     actionRepository.save(newAction);
 
                     Sensor sensor = sensorRepository.findById(actionAvro.getSensorId())
-                            .orElseThrow(() -> new RuntimeException("Sensor not found: " + actionAvro.getSensorId()));
+                            .orElseThrow(() -> new RuntimeException("Сенсор не найден: " + actionAvro.getSensorId()));
 
                     ScenarioAction sa = new ScenarioAction();
-
                     ScenarioActionKey saKey = new ScenarioActionKey();
                     saKey.setScenarioId(scenario.getId());
                     saKey.setSensorId(sensor.getId());
@@ -131,27 +127,26 @@ public class HubService {
 
                     scenarioActions.add(sa);
 
-                    log.info("🛠 Добавлено действие: sensorId={}, type={}, value={}",
+                    log.info("Добавлено действие: sensorId={}, type={}, value={}",
                             sensor.getId(), newAction.getType(), newAction.getValue());
                 }
 
                 scenario.setConditions(scenarioConditions);
                 scenario.setActions(scenarioActions);
-
                 scenarioRepository.save(scenario);
 
-                log.info("✅ Сценарий '{}' успешно сохранён для хаба: {}", scenario.getName(), hubId);
+                log.info("Сценарий '{}' сохранён для хаба {}", scenario.getName(), hubId);
             }
 
             case ScenarioRemovedEventAvro event -> {
                 scenarioRepository.findByHubIdAndName(hubId, event.getName())
                         .ifPresent(scenario -> {
                             scenarioRepository.delete(scenario);
-                            log.info("🗑 Удалён сценарий: '{}' для хаба: {}", event.getName(), hubId);
+                            log.info("Удалён сценарий '{}' для хаба {}", event.getName(), hubId);
                         });
             }
 
-            default -> log.info("Неизвестный класс объекта: {}", payload.getClass().getSimpleName());
+            default -> log.info("Неизвестный тип записи: {}", payload.getClass().getSimpleName());
         }
     }
 }
