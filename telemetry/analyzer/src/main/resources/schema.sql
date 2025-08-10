@@ -1,3 +1,18 @@
+-- Удаляем триггеры, если существуют
+DROP TRIGGER IF EXISTS tr_bi_scenario_conditions_hub_id_check ON scenario_conditions;
+DROP TRIGGER IF EXISTS tr_bi_scenario_actions_hub_id_check ON scenario_actions;
+
+-- Удаляем функцию, если существует
+DROP FUNCTION IF EXISTS check_hub_id;
+
+-- Удаляем таблицы в правильном порядке (сначала зависимости)
+DROP TABLE IF EXISTS scenario_actions;
+DROP TABLE IF EXISTS scenario_conditions;
+DROP TABLE IF EXISTS actions;
+DROP TABLE IF EXISTS conditions;
+DROP TABLE IF EXISTS sensors;
+DROP TABLE IF EXISTS scenarios;
+
 -- создаём таблицу scenarios
 CREATE TABLE IF NOT EXISTS scenarios (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
