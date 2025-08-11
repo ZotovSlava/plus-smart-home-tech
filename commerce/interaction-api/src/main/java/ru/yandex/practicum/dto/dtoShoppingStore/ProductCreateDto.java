@@ -20,10 +20,8 @@ public class ProductCreateDto {
 
     private String imageSrc;
 
-    @NotBlank(message = "QuantityState can not be blank")
     private QuantityState quantityState;
 
-    @NotBlank(message = "ProductState can not be blank")
     private ProductState productState;
 
 

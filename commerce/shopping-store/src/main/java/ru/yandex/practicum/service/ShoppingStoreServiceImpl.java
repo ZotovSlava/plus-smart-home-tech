@@ -10,7 +10,6 @@ import ru.yandex.practicum.mapper.ProductMapper;
 import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.storage.ShoppingStoreRepository;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -20,9 +19,9 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     private final ShoppingStoreRepository shoppingStoreRepository;
 
     @Override
-    public List<ProductRequestDto> getByType(ProductCategory productCategory, Pageable pageable) {
+    public Page<ProductRequestDto> getByType(ProductCategory productCategory, Pageable pageable) {
         Page<Product> productsPage = shoppingStoreRepository.findAllByProductCategory(productCategory, pageable);
-        return productsPage.map(ProductMapper::toRequestDto).toList();
+        return productsPage.map(ProductMapper::toRequestDto);
     }
 
     @Override
@@ -77,9 +76,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     }
 
     @Override
-    public Boolean removeFromStore(ProductUpdateDto productUpdateDto) {
-        UUID productId = productUpdateDto.getProductId();
-
+    public Boolean removeFromStore(UUID productId) {
         Product product = shoppingStoreRepository.getByProductId(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found"));
 
@@ -91,13 +88,12 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     }
 
     @Override
-    public Boolean updateQuantityState(ProductUpdateDto productUpdateDto) {
-        UUID productId = productUpdateDto.getProductId();
+    public Boolean updateQuantityState(UUID productId, QuantityState quantityState) {
 
         Product product = shoppingStoreRepository.getByProductId(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found"));
 
-        product.setQuantityState(productUpdateDto.getQuantityState());
+        product.setQuantityState(quantityState);
 
         shoppingStoreRepository.save(product);
 

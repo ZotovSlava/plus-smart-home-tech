@@ -3,7 +3,10 @@ package ru.yandex.practicum.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.dto.dtoShoppingCart.ShoppingCartDto;
-import ru.yandex.practicum.dto.dtoWarehouse.*;
+import ru.yandex.practicum.dto.dtoWarehouse.AddProductToWarehouseRequest;
+import ru.yandex.practicum.dto.dtoWarehouse.AddressDto;
+import ru.yandex.practicum.dto.dtoWarehouse.BookedProductsDto;
+import ru.yandex.practicum.dto.dtoWarehouse.ProductCreateDto;
 import ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouse;
 import ru.yandex.practicum.exception.ProductNotFoundException;
 import ru.yandex.practicum.exception.SpecifiedProductAlreadyInWarehouseException;
@@ -61,7 +64,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         double deliveryWeight = 0.0;
         double deliveryVolume = 0.0;
 
-        for (Map.Entry<UUID, Integer> entry : shoppingCartDto.getProductsMap().entrySet()) {
+        for (Map.Entry<UUID, Integer> entry : shoppingCartDto.getProducts().entrySet()) {
             UUID key = entry.getKey();
             Integer value = entry.getValue();
 

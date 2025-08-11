@@ -4,7 +4,10 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.dtoShoppingCart.ShoppingCartDto;
-import ru.yandex.practicum.dto.dtoWarehouse.*;
+import ru.yandex.practicum.dto.dtoWarehouse.AddProductToWarehouseRequest;
+import ru.yandex.practicum.dto.dtoWarehouse.AddressDto;
+import ru.yandex.practicum.dto.dtoWarehouse.BookedProductsDto;
+import ru.yandex.practicum.dto.dtoWarehouse.ProductCreateDto;
 import ru.yandex.practicum.feign.WarehouseClient;
 import ru.yandex.practicum.service.WarehouseService;
 

@@ -13,8 +13,8 @@ import java.util.UUID;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = "/api/v1/shopping-car")
-public class SoppingCartController implements ShoppingCartClient {
+@RequestMapping(path = "/api/v1/shopping-cart")
+public class ShoppingCartController implements ShoppingCartClient {
     private final ShoppingCartService shoppingCartService;
 
     @Override

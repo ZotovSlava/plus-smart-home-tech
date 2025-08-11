@@ -21,7 +21,7 @@ public class ProductCreateDto {
     private Boolean fragile;
 
     @Valid
-    private DimensionDto dimensionDto;
+    private DimensionDto dimension;
 
     @NotNull(message = "Weight can not be null")
     @DecimalMin(value = "1.0", message = "Weight must be at least 1")

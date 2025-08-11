@@ -18,5 +18,5 @@ public class ShoppingCartDto {
     private UUID shoppingCartId;
 
     @NotNull(message = "Products map cannot be null")
-    private Map<UUID, Integer> productsMap;
+    private Map<UUID, Integer> products;
 }

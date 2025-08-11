@@ -2,17 +2,15 @@ package ru.yandex.practicum.controller;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.dto.dtoShoppingStore.ProductCategory;
-import ru.yandex.practicum.dto.dtoShoppingStore.ProductCreateDto;
-import ru.yandex.practicum.dto.dtoShoppingStore.ProductRequestDto;
-import ru.yandex.practicum.dto.dtoShoppingStore.ProductUpdateDto;
+import ru.yandex.practicum.dto.dtoShoppingStore.*;
 import ru.yandex.practicum.feign.ShoppingStoreClient;
 import ru.yandex.practicum.service.ShoppingStoreService;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -24,11 +22,9 @@ public class ShoppingStoreController implements ShoppingStoreClient {
 
     @Override
     @GetMapping
-    public List<ProductRequestDto> getByType( @RequestParam("category") ProductCategory productCategory,
-                                              @RequestParam(defaultValue = "0") int page,
-                                              @RequestParam(defaultValue = "10") int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<ProductRequestDto> getByType(
+            @RequestParam("category") ProductCategory productCategory,
+            Pageable pageable) {
         return shoppingStoreService.getByType(productCategory, pageable);
     }
 
@@ -52,13 +48,14 @@ public class ShoppingStoreController implements ShoppingStoreClient {
 
     @Override
     @PostMapping("/removeProductFromStore")
-    public Boolean removeFromStore(@Valid @RequestBody ProductUpdateDto productUpdateDto) {
-        return shoppingStoreService.removeFromStore(productUpdateDto);
+    public Boolean removeFromStore(@RequestBody UUID productID) {
+        return shoppingStoreService.removeFromStore(productID);
     }
 
     @Override
     @PostMapping("/quantityState")
-    public Boolean updateQuantityState(@Valid @RequestBody ProductUpdateDto productUpdateDto) {
-        return shoppingStoreService.updateQuantityState(productUpdateDto);
+    public Boolean updateQuantityState(@RequestParam UUID productId,
+                                       @RequestParam QuantityState quantityState) {
+        return shoppingStoreService.updateQuantityState(productId, quantityState);
     }
 }

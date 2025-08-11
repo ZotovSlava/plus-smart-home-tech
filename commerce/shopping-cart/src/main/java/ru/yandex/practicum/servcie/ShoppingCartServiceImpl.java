@@ -36,7 +36,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return shoppingCartRepository.getByUsername(username)
                 .map(cart -> ShoppingCartDto.builder()
                         .shoppingCartId(cart.getShoppingCartId())
-                        .productsMap(getProductQuantities(cart.getShoppingCartId()))
+                        .products(getProductQuantities(cart.getShoppingCartId()))
                         .build()
                 )
                 .orElseGet(() -> {
@@ -49,7 +49,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
                     return ShoppingCartDto.builder()
                             .shoppingCartId(newCart.getShoppingCartId())
-                            .productsMap(new HashMap<>())
+                            .products(new HashMap<>())
                             .build();
                 });
     }
@@ -96,7 +96,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
         return ShoppingCartDto.builder()
                 .shoppingCartId(shoppingCart.getShoppingCartId())
-                .productsMap(getProductQuantities(shoppingCart.getShoppingCartId()))
+                .products(getProductQuantities(shoppingCart.getShoppingCartId()))
                 .build();
     }
 
@@ -136,7 +136,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
         return ShoppingCartDto.builder()
                 .shoppingCartId(shoppingCart.getShoppingCartId())
-                .productsMap(getProductQuantities(shoppingCart.getShoppingCartId()))
+                .products(getProductQuantities(shoppingCart.getShoppingCartId()))
                 .build();
     }
 
@@ -163,7 +163,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
         return ShoppingCartDto.builder()
                 .shoppingCartId(shoppingCart.getShoppingCartId())
-                .productsMap(getProductQuantities(shoppingCart.getShoppingCartId()))
+                .products(getProductQuantities(shoppingCart.getShoppingCartId()))
                 .build();
     }
 
