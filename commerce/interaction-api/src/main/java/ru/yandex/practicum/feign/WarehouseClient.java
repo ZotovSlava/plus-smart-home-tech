@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.dtoShoppingCart.ShoppingCartDto;
 import ru.yandex.practicum.dto.dtoWarehouse.*;
 
+import java.util.Map;
+import java.util.UUID;
+
 @FeignClient(name = "warehouse")
 public interface WarehouseClient {
 
@@ -20,4 +23,13 @@ public interface WarehouseClient {
 
     @PostMapping("/api/v1/warehouse/add")
     void addProduct(@Valid @RequestBody AddProductToWarehouseRequest addProductToWarehouseRequest);
+
+    @PostMapping("/api/v1/warehouse/shipped")
+    void shippedOrder(@Valid @RequestBody ShippedToDeliveryRequest shippedToDeliveryRequest);
+
+    @PostMapping("/api/v1/warehouse/return")
+    void returnProducts(@RequestBody Map<UUID, Integer> products);
+
+    @PostMapping("/api/v1/warehouse/assembly")
+    BookedProductsDto collectOrder(@Valid @RequestBody AssemblyProductsForOrderRequest assemblyProductsForOrderRequest);
 }
