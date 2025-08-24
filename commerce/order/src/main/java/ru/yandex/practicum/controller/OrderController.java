@@ -1,8 +1,7 @@
 package ru.yandex.practicum.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.dtoOrder.CreateNewOrderRequest;
 import ru.yandex.practicum.dto.dtoOrder.OrderDto;
@@ -25,27 +24,23 @@ public class OrderController implements OrderClient {
         return orderService.getAllUserOrder(username);
     }
 
-
     @Override
     @PutMapping
-    public OrderDto create(@RequestBody CreateNewOrderRequest createNewOrderRequest) {
+    public OrderDto create(@Valid @RequestBody CreateNewOrderRequest createNewOrderRequest) {
         return orderService.create(createNewOrderRequest);
     }
 
-
     @Override
     @PostMapping("/return")
-    public OrderDto returnProduct(@RequestBody ProductReturnRequest productReturnRequest) {
+    public OrderDto returnProduct(@Valid @RequestBody ProductReturnRequest productReturnRequest) {
         return orderService.returnProduct(productReturnRequest);
     }
-
 
     @Override
     @PostMapping("/payment")
     public OrderDto processPayment(@RequestBody UUID orderID) {
         return orderService.processPayment(orderID);
     }
-
 
     @Override
     @PostMapping("/payment/failed")

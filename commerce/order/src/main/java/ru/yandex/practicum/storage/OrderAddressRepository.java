@@ -2,7 +2,6 @@ package ru.yandex.practicum.storage;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import ru.yandex.practicum.model.OrderAddress;
-import ru.yandex.practicum.model.OrderItem;
 
 import java.util.UUID;
 

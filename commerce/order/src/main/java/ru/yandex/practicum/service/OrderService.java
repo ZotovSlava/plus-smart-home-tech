@@ -1,7 +1,5 @@
 package ru.yandex.practicum.service;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import ru.yandex.practicum.dto.dtoOrder.CreateNewOrderRequest;
 import ru.yandex.practicum.dto.dtoOrder.OrderDto;
 import ru.yandex.practicum.dto.dtoOrder.ProductReturnRequest;

@@ -7,7 +7,10 @@ import ru.yandex.practicum.dto.dtoWarehouse.BookedProductsDto;
 import ru.yandex.practicum.model.Order;
 import ru.yandex.practicum.model.OrderItem;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class OrderMapper {
     public static Order toEntity(CreateNewOrderRequest createNewOrderRequest, BookedProductsDto bookedProductsDto) {
@@ -20,7 +23,7 @@ public class OrderMapper {
                 .build();
     }
 
-    public static OrderDto toDto(Order order,CreateNewOrderRequest createNewOrderRequest) {
+    public static OrderDto toDto(Order order, CreateNewOrderRequest createNewOrderRequest) {
         return OrderDto.builder()
                 .orderId(order.getOrderId())
                 .shoppingCartId(createNewOrderRequest.getShoppingCartDto().getShoppingCartId())
@@ -54,11 +57,11 @@ public class OrderMapper {
                 .build();
     }
 
-    private static Map<UUID, Integer> getProductsMap(List<OrderItem> orderItems){
+    private static Map<UUID, Integer> getProductsMap(List<OrderItem> orderItems) {
         Map<UUID, Integer> products = new HashMap<>();
 
-        for(OrderItem orderItem : orderItems){
-            products.put(orderItem.getProductId(),orderItem.getQuantity());
+        for (OrderItem orderItem : orderItems) {
+            products.put(orderItem.getProductId(), orderItem.getQuantity());
         }
 
         return products;

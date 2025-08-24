@@ -18,6 +18,12 @@ public class ShoppingCartController implements ShoppingCartClient {
     private final ShoppingCartService shoppingCartService;
 
     @Override
+    @GetMapping("/name")
+    public String getNameById(@RequestParam UUID shoppingCartId) {
+        return shoppingCartService.getNameById(shoppingCartId);
+    }
+
+    @Override
     @GetMapping
     public ShoppingCartDto getByUsername(@RequestParam String username) {
         return shoppingCartService.getByUsername(username);

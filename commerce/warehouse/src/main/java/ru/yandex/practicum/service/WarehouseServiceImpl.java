@@ -184,10 +184,10 @@ public class WarehouseServiceImpl implements WarehouseService {
                     .build());
         }
 
-        OrderBooking.builder()
+        orderBookingRepository.save(OrderBooking.builder()
                 .orderId(assemblyProductsForOrderRequest.getOrderId())
                 .bookingProducts(bookingProducts)
-                .build();
+                .build());
 
         return BookedProductsDto.builder()
                 .fragile(fragile)

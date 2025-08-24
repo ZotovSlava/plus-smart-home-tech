@@ -10,11 +10,13 @@ import ru.yandex.practicum.dto.dtoOrder.OrderState;
 import ru.yandex.practicum.dto.dtoOrder.ProductReturnRequest;
 import ru.yandex.practicum.dto.dtoPayment.PaymentDto;
 import ru.yandex.practicum.dto.dtoWarehouse.AddressDto;
+import ru.yandex.practicum.dto.dtoWarehouse.AssemblyProductsForOrderRequest;
 import ru.yandex.practicum.dto.dtoWarehouse.BookedProductsDto;
 import ru.yandex.practicum.exception.NotAuthorizedUserException;
 import ru.yandex.practicum.exception.OrderNotFoundException;
 import ru.yandex.practicum.feign.DeliveryClient;
 import ru.yandex.practicum.feign.PaymentClient;
+import ru.yandex.practicum.feign.ShoppingCartClient;
 import ru.yandex.practicum.feign.WarehouseClient;
 import ru.yandex.practicum.mapper.AddressMapper;
 import ru.yandex.practicum.mapper.OrderMapper;
@@ -22,7 +24,6 @@ import ru.yandex.practicum.model.Order;
 import ru.yandex.practicum.model.OrderAddress;
 import ru.yandex.practicum.model.OrderItem;
 import ru.yandex.practicum.storage.OrderAddressRepository;
-import ru.yandex.practicum.storage.OrderItemRepository;
 import ru.yandex.practicum.storage.OrderRepository;
 
 import java.math.BigDecimal;
@@ -33,11 +34,11 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
     private final PaymentClient paymentClient;
     private final DeliveryClient deliveryClient;
     private final WarehouseClient warehouseClient;
     private final OrderAddressRepository orderAddressRepository;
+    private final ShoppingCartClient shoppingCartClient;
 
     @Override
     public List<OrderDto> getAllUserOrder(String username) {
@@ -54,8 +55,12 @@ public class OrderServiceImpl implements OrderService {
         BookedProductsDto bookedProductsDto =
                 warehouseClient.checkAvailabilityProduct(createNewOrderRequest.getShoppingCartDto());
 
+        shoppingCartClient.getNameById(createNewOrderRequest.getShoppingCartDto().getShoppingCartId());
+
         Order order = orderRepository
                 .save(OrderMapper.toEntity(createNewOrderRequest, bookedProductsDto));
+
+        order.setUsername(shoppingCartClient.getNameById(createNewOrderRequest.getShoppingCartDto().getShoppingCartId()));
 
         Map<UUID, Integer> products = createNewOrderRequest.getShoppingCartDto().getProducts();
 
@@ -66,8 +71,10 @@ public class OrderServiceImpl implements OrderService {
                     .quantity(quantity)
                     .build();
 
-            orderItemRepository.save(orderItem);
+            order.getProducts().add(orderItem);
         });
+
+        orderRepository.save(order);
 
         AddressDto warehouseAddress = warehouseClient.getAddress();
         AddressDto userAddress = createNewOrderRequest.getAddressDto();
@@ -209,6 +216,18 @@ public class OrderServiceImpl implements OrderService {
     public OrderDto collectOrder(UUID orderID) {
         Order order = orderRepository.findById(orderID)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+
+        List<OrderItem> orderItems = order.getProducts();
+        Map<UUID, Integer> products = new HashMap<>();
+
+        orderItems.forEach(orderItem ->
+                products.put(orderItem.getProductId(), orderItem.getQuantity())
+        );
+
+        warehouseClient.collectOrder(AssemblyProductsForOrderRequest.builder()
+                .orderId(orderID)
+                .products(products)
+                .build());
 
         order.setState(OrderState.ASSEMBLED);
 

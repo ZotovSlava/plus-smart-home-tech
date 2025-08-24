@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.yandex.practicum.dto.dtoDelivery.DeliveryState;
 
 import java.util.List;
 import java.util.UUID;

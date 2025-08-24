@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.dtoDelivery.DeliveryDto;
 import ru.yandex.practicum.dto.dtoOrder.OrderDto;
 import ru.yandex.practicum.feign.DeliveryClient;
-import ru.yandex.practicum.model.Delivery;
 import ru.yandex.practicum.service.DeliveryService;
 
 import java.math.BigDecimal;

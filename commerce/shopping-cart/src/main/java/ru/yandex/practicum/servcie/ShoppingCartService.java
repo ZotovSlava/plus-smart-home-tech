@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface ShoppingCartService {
+
+    public String getNameById(UUID shoppingCartId);
+
     ShoppingCartDto getByUsername(String username);
 
     ShoppingCartDto addProduct(String username, Map<UUID, Integer> products);

@@ -28,6 +28,13 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final WarehouseClient warehouseClient;
 
     @Override
+    public String getNameById(UUID shoppingCartId) {
+        ShoppingCart shoppingCart = shoppingCartRepository.findById(shoppingCartId).get();
+
+        return shoppingCart.getUsername();
+    }
+
+    @Override
     public ShoppingCartDto getByUsername(String username) {
         if (username == null || username.isEmpty()) {
             throw new NotAuthorizedUserException("User not authorized");

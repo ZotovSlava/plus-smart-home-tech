@@ -7,8 +7,9 @@ import ru.yandex.practicum.DeliveryMapper.DeliveryMapper;
 import ru.yandex.practicum.dto.dtoDelivery.DeliveryDto;
 import ru.yandex.practicum.dto.dtoDelivery.DeliveryState;
 import ru.yandex.practicum.dto.dtoOrder.OrderDto;
+import ru.yandex.practicum.dto.dtoWarehouse.ShippedToDeliveryRequest;
 import ru.yandex.practicum.exception.DeliveryNotFoundException;
-import ru.yandex.practicum.feign.OrderClient;
+import ru.yandex.practicum.feign.WarehouseClient;
 import ru.yandex.practicum.model.Address;
 import ru.yandex.practicum.model.Delivery;
 import ru.yandex.practicum.storage.AddressRepository;
@@ -24,6 +25,7 @@ public class DeliveryServiceImpl implements DeliveryService {
 
     private final DeliveryRepository deliveryRepository;
     private final AddressRepository addressRepository;
+    private final WarehouseClient warehouseClient;
 
     @Override
     public DeliveryDto create(DeliveryDto deliveryDto) {
@@ -63,6 +65,11 @@ public class DeliveryServiceImpl implements DeliveryService {
         Delivery delivery = deliveryRepository.findByOrderId(orderID)
                 .orElseThrow(() -> new DeliveryNotFoundException("Delivery not found exception"));
 
+        warehouseClient.shippedOrder(ShippedToDeliveryRequest.builder()
+                .orderId(orderID)
+                .deliveryId(delivery.getDeliveryId())
+                .build());
+
         delivery.setDeliveryState(DeliveryState.IN_PROGRESS);
 
         deliveryRepository.save(delivery);
@@ -82,16 +89,17 @@ public class DeliveryServiceImpl implements DeliveryService {
     public BigDecimal calculateDeliveryCost(OrderDto orderDto) {
         double deliveryCost = BASE_DELIVERY_COST;
 
-        Delivery delivery = deliveryRepository.findById(orderDto.getDeliveryId()).orElseThrow();
+        Delivery delivery = deliveryRepository.findById(orderDto.getDeliveryId())
+                .orElseThrow(() -> new DeliveryNotFoundException("Delivery not found exception"));
 
         Address address = delivery.getFromAddress();
 
-        if (delivery.getFromAddress().getCity().equals("ADDRESS_1")) {
-            deliveryCost += 5;
+        if ("ADDRESS_1".equals(delivery.getFromAddress().getCity())) {
+            deliveryCost += BASE_DELIVERY_COST * 1;
         }
 
-        if (delivery.getFromAddress().getCity().equals("ADDRESS_2")) {
-            deliveryCost += 10;
+        if ("ADDRESS_2".equals(delivery.getFromAddress().getCity())) {
+            deliveryCost += BASE_DELIVERY_COST * 2;
         }
 
         if (orderDto.getFragile()) {
