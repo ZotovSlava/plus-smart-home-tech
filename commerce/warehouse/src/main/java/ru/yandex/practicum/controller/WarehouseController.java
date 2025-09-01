@@ -4,12 +4,12 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.dtoShoppingCart.ShoppingCartDto;
-import ru.yandex.practicum.dto.dtoWarehouse.AddProductToWarehouseRequest;
-import ru.yandex.practicum.dto.dtoWarehouse.AddressDto;
-import ru.yandex.practicum.dto.dtoWarehouse.BookedProductsDto;
-import ru.yandex.practicum.dto.dtoWarehouse.ProductCreateDto;
+import ru.yandex.practicum.dto.dtoWarehouse.*;
 import ru.yandex.practicum.feign.WarehouseClient;
 import ru.yandex.practicum.service.WarehouseService;
+
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @AllArgsConstructor
@@ -40,4 +40,22 @@ public class WarehouseController implements WarehouseClient {
     public void addProduct(@Valid @RequestBody AddProductToWarehouseRequest addProductToWarehouseRequest) {
         warehouseService.addProduct(addProductToWarehouseRequest);
     }
+
+    @Override
+    @PostMapping("/shipped")
+    public void shippedOrder(@Valid @RequestBody ShippedToDeliveryRequest shippedToDeliveryRequest){
+        warehouseService.shippedOrder(shippedToDeliveryRequest);
+    }
+
+    @Override
+    @PostMapping("/return")
+    public void returnProducts(@RequestBody Map<UUID, Integer> products){
+        warehouseService.returnProducts(products);
+    }
+
+    @Override
+    @PostMapping("/assembly")
+    public BookedProductsDto collectOrder(@Valid @RequestBody AssemblyProductsForOrderRequest assemblyProductsForOrderRequest){
+        return warehouseService.collectOrder(assemblyProductsForOrderRequest);
+    };
 }
